@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#define N 100
-
 typedef struct _pessoa //144 bytes
 {
     int  linha;
@@ -13,26 +9,15 @@ typedef struct _pessoa //144 bytes
     char celular[13];
 } Pessoa;
 
-typedef struct _node {
-    Pessoa *p;
-} Node;
-
-node* create_hash(int n);
-Pessoa parseData(char linha[]);
-
-int main(){
-
+void printPessoa(Pessoa p){
+    printf("Linha: %d, Nome: %s\n", p.linha, p.nome);
+    printf("Chave: %d, Endereco: %s, Data de Nasc: %s, Email: %s, Celular: %s\n", p.chave, p.endereco, p.datanasc, p.email, p.celular );
+    
 }
-
-node* create_hash(int n){
-    Node *h = (Node*) malloc(sizeof(Node)*n);
-    return h;
-}
-
 Pessoa parseData(char linha[]){
-
     Pessoa r;
     char *pt;
+    /*DESCOBRIR O PQ ELE ESTÁ JUNTANDO A DATA DE NASCIMENTO COM O NOME*/
     pt = strtok (linha, ",");
     r.linha = atoi(pt); // numero da linha
     pt = strtok (NULL, ",");
