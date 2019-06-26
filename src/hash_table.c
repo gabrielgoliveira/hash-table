@@ -1,38 +1,77 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "stc_pessoa.h"
+#include <stdbool.h>
+#include "headers/hashing.h"
+#include "headers/stc_pessoa.h"
 
-#define MAXSIZE 100
-
+//definicao da estrutura
 typedef Pessoa data;
 
 typedef struct _hash_table {
     data *dt;
+    int table_size;
 } hash_table;
 
-hash_table* create_hash();
-int insertbydivision(hash_table *ht, data r, int tablesize);
+//cabecalhos
+hash_table* create_hash(int n);
+bool insertion(hash_table *hash, data x);
+data search(int key, hash_table *hash);
+bool remove_node(int key, hash_table *hash);
+void listar_tabela(hash_table *hash);
+bool save_table(hash_table *hash);
+bool free_table(hash_table *hash);
 
 int main(){
-    /*Essa função principal é so pra testes, esse arquivo se tornara um arquivo de cabeçalho*/
-    Pessoa r;
-    int temp;
-    hash_table *pessoas = create_hash(MAXSIZE);
-    strncpy(r.nome, "Joao Gomes", sizeof(r.nome));
-    r.chave = 13;
-    printPessoa(r);
-    temp = insertbydivision(pessoas, r, MAXSIZE);
-    printf("Função Principal\n");
-    printPessoa(pessoas->dt[temp]);
+    Pessoa temp;
+    char linha[200];
+    int erros = 0, sucesso = 0;
+    char *filename = "../dados/dados-500000-lin.csv";
+    hash_table *cadastro = create_hash(16000);
+    FILE *arquivo = fopen(filename, "r");
+    if(arquivo == NULL){
+        printf("Erro na Abertura do Arquivo!!\n");
+    }
+    //ignorando o cabecalho do arquivo
+    fgets(linha, sizeof(linha), arquivo);
+    
+    //setando linha pessoa
+    temp.linha = 0;
 
+    //lendo o intervalo estabelecido pelo professor
+    while(feof(arquivo) || temp.linha <= 16000){
+        fgets(linha, sizeof(linha), arquivo);
+        temp = parseData(linha);
+        if(temp.linha >= 8000 && temp.linha <=16000){
+            //inserir esse intervalo na tabela
+            if(insertion(cadastro, temp)){
+                sucesso++;
+            }else {
+                erros++;
+            }
+        }
+    }
+    
+    //listar_tabela(cadastro);
+    printf("Ocorreram : %d Colisoes, %d Insercoes\n", erros, sucesso);
+    save_table(cadastro);
+    free_table(cadastro);
+    fclose(arquivo);
+    return 0;
 }
 
+
+//funçoes
 hash_table* create_hash(int n){
     hash_table *ht = (hash_table*) malloc(sizeof(hash_table));
     if(ht != NULL){
         //criar os vetores
         ht->dt = (data*) malloc(n*sizeof(data));
+        //CHAVE -1 REPRESENTA POSICAO VAZIA
+        for(int i = 0; i<n; i++){
+            ht->dt[i].chave = -1;
+        }
+        ht->table_size = n;
         if(ht->dt == NULL){
             printf("Erro de Alocacao no vetor de hash!!\n");
             return NULL;
@@ -41,95 +80,83 @@ hash_table* create_hash(int n){
     return ht;
 }
 
-int insertbydivision(hash_table *ht, data r, int tablesize){
-    /* 
-    * About: Inserção na tabela hash utilizando o metodo da divisão para realizar os calculos de chave
-    * Retorno: Posição onde foi inserido
-    */
-    int key;
-    int pos;
-    if(ht == NULL){
-        printf("ERRO: Voce deve alocar a hash table ou o no em memoria !!\n");
-        return -1;
+bool insertion(hash_table *hash, data x){
+    if(hash == NULL && hash->dt == NULL){
+        return false;
     }
-    key = r.chave;
-    pos = key%tablesize;
-    ht->dt[pos] = r;
-    printf("Elemento na pos: %d\n", pos);
-    printPessoa(ht->dt[pos]);
-    return pos;
-}
-
-int searchbydivision(hash_table *ht, int key, int tablesize){
-    /* 
-    * About: Calcula a posição de um determinado elemento a partir de uma chave
-    * Retorno: Retorna a posição do elemento
-    * Ps: Não vai funcionar se buscar por um elemento que foi inserido por outro metodo
-    */
-    int pos = key%tablesize;
-    return pos;
-}
-
-void removebydivision(){
-
-}
-//hashing
-int parseInt(int *n, int tam){
-    //recebe o vetor com os numeros em ordem inversa
-    int num = 0;
-    int dec = 1;
-    for(int i = 0; i<tam; i++){
-        num += n[i]*dec;
-        dec*=10;
+    int key = x.chave;
+    int pos = hashing(key, hash->table_size);
+    if(hash->dt[pos].chave == -1){
+        //posicao vazia
+        hash->dt[pos] = x;
+        return true;
+    } else {
+        return false;
     }
-    return num;
+    
+    
 }
 
-int division(int n){
-    return n%MAXSIZE;
+data search(int key, hash_table *hash){
+    int pos = hashing(key, hash->table_size);
+    if(hash->dt[pos].chave != -1){
+        //existe alguem no indice buscado
+        return hash->dt[pos];
+    } 
 }
 
-int dobra_v2(){
-    /*Essa função obtem valores diferentes da primeira caso o valor procurado
-    não seja o minimo possivel, 0 - 9 */
-    int n = 12345678;
-    int chave;
+bool remove_node(int key, hash_table *hash){
+    int pos = hashing(key, hash->table_size);
+    if(hash->dt[pos].chave == key){
+        //tudo certo
+        hash->dt[pos].chave = -1;
+        return true;
+    }
+    return false;
+}
 
-    chave = n%10;
-    while(n != 0){
-        n = n/10;
-        chave += n%10;
-        chave = chave%10;
-        if(chave < MAXSIZE){
-            return chave;
+bool free_table(hash_table *hash){
+    if(hash != NULL){
+        free(hash->dt);
+        free(hash);
+        return true;
+    } else {
+        return false;
+    }
+    
+}
+
+void listar_tabela(hash_table *hash){
+    int n = hash->table_size;
+    for(int i = 0; i<n; i++){
+        if(hash->dt[i].chave != -1){
+            printPessoa(hash->dt[i]);
         }
     }
-    return chave;
 }
-int dobra(int n){
-     int chave[10];
-     int cont, cont_temp, flag;
-    //colocando n em um vetor
-    cont=0;
-    while(n != 0){
-        chave[cont] = n%10;
-        n = n/10;
-        cont++;
+bool save_table(hash_table *hash){
+    int n;
+    Pessoa temp;
+    char *filename = "hashtable.txt";
+    FILE *arquivo = fopen(filename, "w");
+    if(hash == NULL || arquivo == NULL){
+        return false;
     }
-    //dobra
-    cont_temp = cont-1;
-    for(int i = 0; i<cont/2; i++){
-        chave[i] = (chave[i] + chave[cont_temp])%10;
-        cont_temp--;
+    n = hash->table_size;
+    for(int i = 0; i<n; i++){
+        if(hash->dt[i].chave != -1){
+            //gravar
+            temp = hash->dt[i];
+            //Sequencia Tabela: linha,Address,id,Birth Date,Name,Email Address,Phone Number
+            fprintf(arquivo, "%d,", temp.linha);
+            fprintf(arquivo, "%s,", temp.endereco);
+            fprintf(arquivo, "%d,", temp.chave);
+            fprintf(arquivo, "%s,", temp.datanasc);
+            fprintf(arquivo, "%s,", temp.nome);
+            fprintf(arquivo, "%s,", temp.email);
+            fprintf(arquivo, "%s\n", temp.celular);
+        }
     }
-    //setando novo tamanho ao vetor
-    cont = cont/2;
-    //convertendo vetor para um numero
-    flag = parseInt(chave, cont);
-    //verificando se a chave obtida eh a desejada
-    if(flag > MAXSIZE){
-        dobra(flag);
-    } else {
-        return flag;
-    }
+    fclose(arquivo);
+
 }
