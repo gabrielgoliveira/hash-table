@@ -1,6 +1,6 @@
 # AED2 - Algoritmos e Estrutura de Dados 2
 
-#Descrição do Trabalho Trabalho 1
+# Descrição do Trabalho Trabalho 1
 
 Neste trabalho serão realizados alguns experimentos com tabelas Hash. As tabelas hash construídas deverão conter funções de:
 * Inserção;
