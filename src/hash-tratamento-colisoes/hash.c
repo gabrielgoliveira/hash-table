@@ -35,12 +35,62 @@ hash_table* create_hash(int n){
     }
     return ht;
 }
+void insert_ht(hash_table *ht, Pessoa p){
+    int pos = hashing(p.chave, ht->table_size);
+    if(ht == NULL){
+        return ;
+    }
+    if(ht->table == NULL){
+        return ;
+    }
+    if(ht->table[pos].p.chave == -1){
+        //posicao vazia
+        ht->table[pos].p = p;
+    } else {
+        printf("\nCOLISAO\n");
+        //inserir na lista externa
+        if(ht->table[pos].externa == NULL){
+            //Lista não existe
+            ht->table[pos].externa = create_list();
+            insert(ht->table[pos].externa, p);
+        } else {
+            insert(ht->table[pos].externa, p);
+        }
+    }
+}
 
 
-
+void print_ht(hash_table *ht){
+    if(ht == NULL){
+        return ;
+    }
+    if(ht->table == NULL){
+        return ;
+    }
+    int table_size = ht->table_size;
+    for(int i = 0; i < table_size; i++){
+        if(ht->table[i].p.chave != -1){
+            printPessoa(ht->table[i].p);
+            if(ht->table[i].externa != NULL){
+                printList(ht->table[i].externa);
+            }
+        }
+    }
+}
 int main(){
     hash_table *teste = create_hash(10);
-    strcpy(teste->table[0].p.nome, "Gabriel");
-    printf("%s\n", teste->table[0].p.nome);
-    printf("%p\n", teste->table[0].externa);
+    Pessoa temp;
+    temp.chave = 10;
+    strcpy(temp.nome, "Gabriel");
+    insert_ht(teste, temp);
+    temp.chave = 20;
+    strcpy(temp.nome, "Maria Karla");
+    insert_ht(teste, temp);
+    temp.chave = 33;
+    strcpy(temp.nome, "Renato");
+    insert_ht(teste, temp);
+    temp.chave = 43;
+    strcpy(temp.nome, "Cleide");
+    insert_ht(teste, temp);
+    print_ht(teste);
 }
