@@ -1,8 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
 #include <stdbool.h>
-#include "../../headers/stc_pessoa.h"
+//#include "../../headers/stc_pessoa.h"
 
 typedef struct _node {
     Pessoa p;
@@ -12,7 +12,7 @@ typedef struct _node {
 typedef struct _list {
     node *root;
 }list;
-
+/* 
 list* create_list();
 node* create_node();
 bool insertion(node *root, node *n);
@@ -25,7 +25,7 @@ void destroying(node*root);
 void destroy(list *l);
 void erase_data(node *root, int chave);
 void erase(list *l, int chave);
-
+*/
 
 list* create_list(){
     list *l = (list*) malloc(sizeof(list));
