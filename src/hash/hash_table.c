@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include "headers/hashing.h"
-#include "headers/stc_pessoa.h"
+#include "../../headers/hashing.h"
+#include "../../headers/stc_pessoa.h"
 
 //definicao da estrutura
 typedef Pessoa data;
@@ -26,7 +26,7 @@ int main(){
     Pessoa temp;
     char linha[200];
     int erros = 0, sucesso = 0;
-    char *filename = "../dados/dados-500000-lin.csv";
+    char *filename = "../../dados/dados-500000-lin.csv";
     hash_table *cadastro = create_hash(16000);
     FILE *arquivo = fopen(filename, "r");
     if(arquivo == NULL){
@@ -34,7 +34,6 @@ int main(){
     }
     //ignorando o cabecalho do arquivo
     fgets(linha, sizeof(linha), arquivo);
-    
     //setando linha pessoa
     temp.linha = 0;
 
@@ -43,6 +42,7 @@ int main(){
         fgets(linha, sizeof(linha), arquivo);
         temp = parseData(linha);
         if(temp.linha >= 8000 && temp.linha <=16000){
+            printPessoa(temp);
             //inserir esse intervalo na tabela
             if(insertion(cadastro, temp)){
                 sucesso++;
@@ -51,7 +51,7 @@ int main(){
             }
         }
     }
-    
+ 
     //listar_tabela(cadastro);
     printf("Ocorreram : %d Colisoes, %d Insercoes\n", erros, sucesso);
     save_table(cadastro);
