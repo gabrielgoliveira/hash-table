@@ -25,6 +25,8 @@ void destroying(node*root);
 void destroy(list *l);
 void erase_data(node *root, int chave);
 void erase(list *l, int chave);
+Pessoa front(list *l);
+void pop_front(list *l);
 
 
 list* create_list(){
@@ -138,4 +140,22 @@ void erase(list *l, int chave){
     }
     erase_data(l->root, chave);
     return ;
+}
+Pessoa front(list *l){
+    if(l != NULL){
+        if(l->root != NULL){
+            return l->root->p;
+        }
+    }
+    
+}
+
+void pop_front(list *l){
+    node *temp = l->root;
+    if(l != NULL){
+        if(l->root != NULL){
+            l->root = l->root->next;
+            free(temp);
+        }
+    }
 }

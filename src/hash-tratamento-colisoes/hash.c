@@ -75,6 +75,34 @@ Pessoa search_ht(hash_table *ht, int chave){
     }
 }
 
+void delete(hash_table *ht, int chave){
+    int pos = hashing(chave, ht->table_size);
+    if(ht->table[pos].p.chave == chave){
+        //achou
+        if(ht->table[pos].externa != NULL){
+            ht->table[pos].p = front(ht->table[pos].externa);
+            pop_front(ht->table[pos].externa);
+        } else {
+            ht->table[pos].p.chave = -1;
+        }
+    } else {
+        //apagar valor da lista externa
+        erase(ht->table[pos].externa, chave);
+    }
+}
+
+void destroy_hash(hash_table *ht){
+    int tam = ht->table_size;
+    for(int i = 0; i<tam; i++){
+        if(ht->table[i].p.chave != -1){
+            if(ht->table[i].externa != NULL){
+                destroy(ht->table[i].externa);
+            }
+        }
+    }
+    free(ht->table);
+    free(ht);
+}
 
 void print_ht(hash_table *ht){
     if(ht == NULL){
@@ -108,7 +136,11 @@ int main(){
     temp.chave = 43;
     strcpy(temp.nome, "Cleide");
     insert_ht(teste, temp);
+    //print_ht(teste);
+    //printf("Resultado da busca\n");
+    //printPessoa(search_ht(teste, 10));
+    //delete(teste, 10);
+    printf("\n------------------ Hash table --------------------- \n");
     print_ht(teste);
-    printf("Resultado da busca\n");
-    printPessoa(search_ht(teste, 10));
+    destroy_hash(teste);
 }
