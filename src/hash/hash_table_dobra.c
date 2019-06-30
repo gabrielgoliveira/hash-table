@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include "../../headers/hashing.h"
+#include "../../headers/hashing_dobra.h"
 #include "../../headers/stc_pessoa.h"
 
 //definicao da estrutura
@@ -27,7 +27,7 @@ int main(){
     char linha[200];
     int erros = 0, sucesso = 0;
     char *filename = "../../dados/dados-500000-lin.csv";
-    hash_table *cadastro = create_hash(16000);
+    hash_table *cadastro = create_hash(9000);
     FILE *arquivo = fopen(filename, "r");
     if(arquivo == NULL){
         printf("Erro na Abertura do Arquivo!!\n");
@@ -38,10 +38,10 @@ int main(){
     temp.linha = 0;
 
     //lendo o intervalo estabelecido pelo professor
-    while(feof(arquivo) || temp.linha <= 16000){
+    while(feof(arquivo) || temp.linha <= 9000){
         fgets(linha, sizeof(linha), arquivo);
         temp = parseData(linha);
-        if(temp.linha >= 8000 && temp.linha <=16000){
+        if(temp.linha >= 8000 && temp.linha <=9000){
             printPessoa(temp);
             //inserir esse intervalo na tabela
             if(insertion(cadastro, temp)){
