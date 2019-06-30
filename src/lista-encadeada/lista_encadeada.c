@@ -1,31 +1,4 @@
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <string.h>
-#include <stdbool.h>
-//#include "../../headers/stc_pessoa.h"
-
-typedef struct _node {
-    Pessoa p;
-    struct _node *next;
-} node;
-
-typedef struct _list {
-    node *root;
-}list;
-
-list* create_list();
-node* create_node();
-bool insertion(node *root, node *n);
-bool insert(list *l, Pessoa p);
-void printl(node *root);
-void printList(list *l);
-Pessoa searching(node *root, int chave);
-Pessoa search(list *l, int chave);
-void destroying(node*root);
-void destroy(list *l);
-void erase_data(node *root, int chave);
-void erase(list *l, int chave);
-
+#include "lista_encadeada.h"
 
 list* create_list(){
     list *l = (list*) malloc(sizeof(list));

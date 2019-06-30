@@ -54,7 +54,23 @@ void insert_ht(hash_table *ht, Pessoa p){
             ht->table[pos].externa = create_list();
             insert(ht->table[pos].externa, p);
         } else {
+            //
             insert(ht->table[pos].externa, p);
+        }
+    }
+}
+
+Pessoa search_ht(hash_table *ht, int chave){
+    int pos = hashing(chave, ht->table_size);
+    if(ht->table[pos].p.chave == chave){
+        //achou
+        return ht->table[pos].p;
+    } else {
+        if(ht->table[pos].externa == NULL){
+            //não tem essa pessoa na hash table
+            exit(1);
+        } else {
+            return search(ht->table[pos].externa, chave);
         }
     }
 }
@@ -93,4 +109,6 @@ int main(){
     strcpy(temp.nome, "Cleide");
     insert_ht(teste, temp);
     print_ht(teste);
+    printf("Resultado da busca\n");
+    printPessoa(search_ht(teste, 10));
 }
