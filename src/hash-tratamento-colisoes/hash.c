@@ -35,17 +35,18 @@ hash_table* create_hash(int n){
     }
     return ht;
 }
-void insert_ht(hash_table *ht, Pessoa p){
+bool insert_ht(hash_table *ht, Pessoa p){
     int pos = hashing(p.chave, ht->table_size);
     if(ht == NULL){
-        return ;
+        return false;
     }
     if(ht->table == NULL){
-        return ;
+        return false;
     }
     if(ht->table[pos].p.chave == -1){
         //posicao vazia
         ht->table[pos].p = p;
+        return true;
     } else {
         printf("\nCOLISAO\n");
         //inserir na lista externa
@@ -53,9 +54,11 @@ void insert_ht(hash_table *ht, Pessoa p){
             //Lista não existe
             ht->table[pos].externa = create_list();
             insert(ht->table[pos].externa, p);
+            return true;
         } else {
             //
             insert(ht->table[pos].externa, p);
+            return true;
         }
     }
 }
@@ -122,25 +125,39 @@ void print_ht(hash_table *ht){
     }
 }
 int main(){
-    hash_table *teste = create_hash(10);
-    Pessoa temp;
-    temp.chave = 10;
-    strcpy(temp.nome, "Gabriel");
-    insert_ht(teste, temp);
-    temp.chave = 20;
-    strcpy(temp.nome, "Maria Karla");
-    insert_ht(teste, temp);
-    temp.chave = 33;
-    strcpy(temp.nome, "Renato");
-    insert_ht(teste, temp);
-    temp.chave = 43;
-    strcpy(temp.nome, "Cleide");
-    insert_ht(teste, temp);
-    //print_ht(teste);
-    //printf("Resultado da busca\n");
-    //printPessoa(search_ht(teste, 10));
-    //delete(teste, 10);
-    printf("\n------------------ Hash table --------------------- \n");
-    print_ht(teste);
-    destroy_hash(teste);
+     Pessoa temp;
+    char linha[200];
+    int erros = 0, sucesso = 0;
+    char *filename = "../../dados/dados-500000-lin.csv";
+    hash_table *cadastro = create_hash(50);
+    FILE *arquivo = fopen(filename, "r");
+    if(arquivo == NULL){
+        printf("Erro na Abertura do Arquivo!!\n");
+    }
+    //ignorando o cabecalho do arquivo
+    fgets(linha, sizeof(linha), arquivo);
+    //setando linha pessoa
+    temp.linha = 0;
+
+    //lendo o intervalo estabelecido pelo professor
+    while(feof(arquivo) || temp.linha <= 16000){
+        fgets(linha, sizeof(linha), arquivo);
+        temp = parseData(linha);
+        if(temp.linha >= 8000 && temp.linha <=16000){
+            printPessoa(temp);
+            //inserir esse intervalo na tabela
+            if(insert_ht(cadastro, temp)){
+                sucesso++;
+            }else {
+                erros++;
+            }
+        }
+    }
+ 
+    //listar_tabela(cadastro);
+    printf("Ocorreram : %d Colisoes, %d Insercoes\n", erros, sucesso);
+    //save_table(cadastro);
+    destroy_hash(cadastro);
+    fclose(arquivo);
+    return 0;
 }

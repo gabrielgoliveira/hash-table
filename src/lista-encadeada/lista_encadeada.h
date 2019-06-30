@@ -102,7 +102,6 @@ void destroying(node*root){
         return;
     }
     destroying(root->next);
-    printPessoa(root->p);
     free(root);
 }
 
